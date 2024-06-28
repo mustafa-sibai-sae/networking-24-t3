@@ -36,7 +36,18 @@ public class Server : MonoBehaviour
 
         }
 
-        for (int i = 0; i < clients.Count; i++)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            for (int i = 0; i < clients.Count; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    clients[i].Send(new PositionPacket(new Vector3(1, 2, j), "dodo", new PlayerData("SERVER", "SERVER")).Serialize());
+                }
+            }
+        }
+
+        /*for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].Available > 0)
             {
@@ -58,6 +69,6 @@ public class Server : MonoBehaviour
 
                 }
             }
-        }
+        }*/
     }
 }

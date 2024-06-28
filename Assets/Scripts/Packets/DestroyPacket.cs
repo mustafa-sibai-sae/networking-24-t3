@@ -27,9 +27,9 @@ public class DestroyPacket : BasePacket
         return EndSerialize();
     }
 
-    public new DestroyPacket Deserialize(byte[] buffer)
+    public new DestroyPacket Deserialize(byte[] buffer, int bufferOffset)
     {
-        base.Deserialize(buffer);
+        base.Deserialize(buffer, bufferOffset);
 
         GameObjectID = br.ReadString();
 

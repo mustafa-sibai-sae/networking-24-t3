@@ -47,45 +47,57 @@ public class NetworkManager : NetworkEvents
         {
             try
             {
+                print($"Buffer size {socket.Available}");
                 byte[] buffer = new byte[socket.Available];
                 socket.Receive(buffer);
 
-                BasePacket bs = new BasePacket().Deserialize(buffer);
+                int bufferOffset = 0;
+                int currentBufferSize = buffer.Length;
 
-                switch (bs.Type)
+                while (currentBufferSize > 0)
                 {
-                    case BasePacket.PacketType.PositionPacket:
-                        PositionPacket ps = new PositionPacket().Deserialize(buffer);
-                        ReceivePlayerPositionPacketEvent(ps.Position, ps.GameObjectID);
-                        break;
+                    BasePacket bs = new BasePacket().Deserialize(buffer, bufferOffset);
+                    currentBufferSize -= bs.PacketSize;
 
-                    case BasePacket.PacketType.InstantiatePacket:
-                        InstantiatePacket ip = new InstantiatePacket().Deserialize(buffer);
-                        GameObject go = Instantiate(Resources.Load<GameObject>(ip.PrefabName), ip.Position, ip.Rotation);
+                    switch (bs.Type)
+                    {
+                        case BasePacket.PacketType.PositionPacket:
+                            PositionPacket ps = new PositionPacket().Deserialize(buffer, bufferOffset);
+                            bufferOffset += ps.PacketSize;
+                            print("DODO!!!");
+                            
+                            ReceivePlayerPositionPacketEvent(ps.Position, ps.GameObjectID);
+                            break;
 
-                        NetworkComponent nc = go.GetComponent<NetworkComponent>();
-                        nc.OwnerID = ip.PlayerData.ID;
-                        instansiatedGameObjects.Add(nc);
-                        break;
+                        case BasePacket.PacketType.InstantiatePacket:
+                            InstantiatePacket ip = new InstantiatePacket().Deserialize(buffer, bufferOffset);
+                            bufferOffset += ip.PacketSize;
 
-                    case BasePacket.PacketType.DestroyPacket:
-                        DestroyPacket dp = new DestroyPacket().Deserialize(buffer);
+                            GameObject go = Instantiate(Resources.Load<GameObject>(ip.PrefabName), ip.Position, ip.Rotation);
 
-                        for (int i = 0; i < instansiatedGameObjects.Count; i++)
-                        {
-                            if (instansiatedGameObjects[i].GameObjectID == dp.GameObjectID)
+                            NetworkComponent nc = go.GetComponent<NetworkComponent>();
+                            nc.OwnerID = ip.PlayerData.ID;
+                            instansiatedGameObjects.Add(nc);
+                            break;
+
+                        case BasePacket.PacketType.DestroyPacket:
+                            DestroyPacket dp = new DestroyPacket().Deserialize(buffer, bufferOffset);
+                            bufferOffset += dp.PacketSize;
+
+                            for (int i = 0; i < instansiatedGameObjects.Count; i++)
                             {
-                                Destroy(instansiatedGameObjects[i].gameObject);
-                                instansiatedGameObjects.RemoveAt(i);
-                                break;
+                                if (instansiatedGameObjects[i].GameObjectID == dp.GameObjectID)
+                                {
+                                    Destroy(instansiatedGameObjects[i].gameObject);
+                                    instansiatedGameObjects.RemoveAt(i);
+                                    break;
+                                }
                             }
-                        }
-                        break;
+                            break;
 
-
-
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
             catch

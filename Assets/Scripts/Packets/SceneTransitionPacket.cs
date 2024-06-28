@@ -24,9 +24,9 @@ public class SceneTransitionPacket : BasePacket
         return EndSerialize();
     }
 
-    public new SceneTransitionPacket Deserialize(byte[] buffer)
+    public new SceneTransitionPacket Deserialize(byte[] buffer, int bufferOffset)
     {
-        base.Deserialize(buffer);
+        base.Deserialize(buffer, bufferOffset);
 
         SceneName = br.ReadString();
 

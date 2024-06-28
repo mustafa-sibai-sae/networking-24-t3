@@ -42,9 +42,9 @@ public class InstantiatePacket : BasePacket
         return EndSerialize();
     }
 
-    public new InstantiatePacket Deserialize(byte[] buffer)
+    public new InstantiatePacket Deserialize(byte[] buffer, int bufferOffset)
     {
-        base.Deserialize(buffer);
+        base.Deserialize(buffer, bufferOffset);
 
         PrefabName = br.ReadString();
 

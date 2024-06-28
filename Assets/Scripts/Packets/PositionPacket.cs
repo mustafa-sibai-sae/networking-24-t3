@@ -27,12 +27,13 @@ public class PositionPacket : BasePacket
         bw.Write(Position.x);
         bw.Write(Position.y);
         bw.Write(Position.z);
+
         return EndSerialize();
     }
 
-    public new PositionPacket Deserialize(byte[] buffer)
+    public new PositionPacket Deserialize(byte[] buffer, int bufferOffset)
     {
-        base.Deserialize(buffer);
+        base.Deserialize(buffer, bufferOffset);
 
         GameObjectID = br.ReadString();
 

@@ -16,6 +16,7 @@ public class BasePacket
 
     public PacketType Type { get; private set; }
     public PlayerData PlayerData { get; private set; }
+    public int PacketSize { get; private set; }
 
     protected MemoryStream wms;
     protected BinaryWriter bw;
@@ -47,13 +48,16 @@ public class BasePacket
 
     protected byte[] EndSerialize()
     {
+        PacketSize = (int)wms.Length + 4;
+        bw.Write(PacketSize);
         return wms.ToArray();
     }
 
-    public BasePacket Deserialize(byte[] buffer)
+    public BasePacket Deserialize(byte[] buffer, int bufferOffset)
     {
         rms = new MemoryStream(buffer);
         br = new BinaryReader(rms);
+        rms.Seek(bufferOffset, SeekOrigin.Begin);
 
         Type = (PacketType)br.ReadInt32();
         PlayerData = new PlayerData(br.ReadString(), br.ReadString());
