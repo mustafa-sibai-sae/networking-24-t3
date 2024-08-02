@@ -22,6 +22,7 @@ public class PositionPacket : BasePacket
     public byte[] Serialize()
     {
         BeginSerialize();
+
         bw.Write(GameObjectID);
 
         bw.Write(Position.x);

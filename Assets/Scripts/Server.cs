@@ -9,6 +9,7 @@ public class Server : MonoBehaviour
 {
     Socket socket;
     List<Socket> clients = new List<Socket>();
+    List<Slot> slots = new List<Slot>();
 
     void Start()
     {
